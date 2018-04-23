@@ -1,100 +1,142 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
 
-    <title>Hangman!</title>
+  <title>Hangman!</title>
 
 </head>
 
 <body>
 
-    <h1>Hangman!</h1>
-
-    <p id="guessMe">
-
+  <div class="row">
+    <h1 align="center" class="text-primary"> Hangman!</h1>
+  </div>
+  <div class="row">
+    <h2>
+      <span align="center" class="text-muted" id='starting'> </span>
+    </h2>
+  </div>
+  <div class="row" align="center">
+    <h3>
+      <span id="luxcarBrands"> </span>
+    </h3>
+  </div>
+  <div class="row" align="center">
+    <div class="col-md-4"></div>
+    <p class="col-md-2 text-success">Wins:
+      <span id="wins"> </span>
     </p>
+    <p class="col-md-2 text-danger">Losses:
+      <span id="losses"> </span>
+    </p>
+  </div>
+  <div class="row" align="center">
+    <p> Guesses Left:
+      <span id='guessesLeft'></span>
+    </p>
+    <p>Letters Guessed:</p>
+    <div class="row">
+      <span id='guessedLetters'></span>
+    </div>
+  </div>
+  <script>
+ 
+    // Answer Array.
 
-    <script>
-
-    // Create an array of words
-
-    var luxcarBrands = ["alfa romeo", "aston martin", "land rover", "range rover", "lamborgini", "tesla", "hummer",
-            "cadillac", "porsche", "audi", "jaguar", "ferrari", "bentley"
-    
+    var luxcarBrandsArr = ["alfa romeo", "aston martin", "land rover", "range rover", "lamborgini", "tesla", "hummer",
+      "cadillac", "porsche", "audi", "jaguar", "ferrari", "bentley"
     ];
 
-    // Pick a random word
+    // using above array we choose a random luxcarBrands.
+    var luxcarBrands = luxcarBrandsArr[Math.floor(Math.random() * luxcarBrandsArr.length)];
 
-    var luxcarBrands = luxcarBrands[Math.floor(Math.random() * luxcarBrands.length)];
 
-    // Set up the answer array
+    // global variables 
 
+    var submit;
     var answerArray = [];
+    var guessesLeft;
+    var guessedLetters;
+    var activeWordArray;
+    var wins = 0;
+    var losses = 0
 
-    for (var i = 0; i < luxcarBrands.length; i++) {
+    function start() {
+      correctGuess = 0;
+      activeWordArray = [];
+      guessedLetters = [];
+      guessesLeft = 8;
+      blanks = []
 
-      answerArray[i] = "_";
+      document.getElementById("wins").innerHTML = wins;
+      document.getElementById("losses").innerHTML = losses;
+      document.getElementById("guessesLeft").innerHTML = guessesLeft;
+      document.getElementById("guessedLetters").innerHTML = guessedLetters;
+      document.getElementById('starting').innerHTML = ("<h1>Press Any Letter To Start</h1>");
 
+      guessMe();
     }
 
-    var remainingLetters = luxcarBrands.length;
 
-    // The game loop
-
-    while (remainingLetters > 0) {
-
-      // Show the player their progress
-
-      alert(answerArray.join(" "));
-
-    
-      // Get a guess from the player
-
-      var guess = prompt("Guess a letter");
-
-      if (guess === null) {
-
-        // Exit the game loop
-
-        break;
-
-      } else if (guess.length !== 1) {
-
-        alert("Please enter a single letter.");
-
-      } else {
-
-        // Update the game state with the guess
+    function guessMe() {
 
 
-        for (var j = 0; j < luxcarBrands.length; j++) {
+      activeWordArray = luxcarBrands.split('');
 
-          if (luxcarBrands[j] === guess) {
+      // blankSpaces = luxcarBrands.length;
+      // blank = [];
+      for (var i = 0; i < activeWordArray.length; i++) {
+        // space = "__"
+        blanks.push(" __ ");
+        document.getElementById("luxcarBrands").innerHTML = blanks.join("  ");
+      };
+    }
 
-            answerArray[j] = guess;
 
-            remainingLetters--;
+    document.onkeyup = function (event) {
+      guess = event.key.toLowerCase();
 
+      // Return false if not letter of the alphabet
+      var letter = new RegExp(/^[a-zA-Z]+$/);
+      if (!letter.test(guess)) {
+        return false;
+      }
+      // a value of less than 0 = a letter that hasn't been guessed
+      if (guessedLetters.indexOf(guess) < 0) {
+        guessedLetters.push(guess);
+        document.getElementById('guessedLetters').innerHTML = guessedLetters.join(" ");
 
+        if (activeWordArray.indexOf(guess) >= 0) {
+          for (var i = 0; i < luxcarBrands.length; i++) {
+            if (guess === activeWordArray[i]) {
+              blanks[i] = guess;
+              document.getElementById('luxcarBrands').innerHTML = blanks.join(' ');
+            }
           }
+          if (blanks.indexOf(" __ ") < 0) {
+            wins++;
+            document.getElementById("display").innerHTML = luxcarBrands;
+            start();
+          }
+        } else {
+          guessesLeft--;
+          document.getElementById("guessesLeft").innerHTML = guessesLeft;
 
+
+          if (guessesLeft === 0) {
+            losses++;
+            start();
+          }
+          // check if game is over
         }
-
       }
 
-    // The end of the game loop
+    };
 
-    }
 
-    // Show the answer and congratulate the player
-
-    alert(answerArray.join(" "));
-
-    alert("Good job! The answer was " + word);
-
-    </script>
+    start();
+  </script>
 
 </body>
 
